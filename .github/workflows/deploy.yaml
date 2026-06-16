@@ -96,6 +96,11 @@ on:
         type: string
         default: ''
 
+      application_suffix:
+        required: false
+        type: string
+        default: ""
+        
       # Environment map (single supported shape)
       env_map:
         description: >-
@@ -293,12 +298,14 @@ jobs:
       uses: actions/github-script@v9
       env:
         APP_DETAILS: ${{ inputs.application_details }}
+        APP_SUFFIX: ${{ inputs.application_suffix }}
         APPLICATION: ${{ inputs.application }}
         DEPLOY_PATH: ${{ inputs.deploy_path }}
         IMG_ONE: ${{ inputs.image_base_name }}
         IMG_LIST: ${{ inputs.image_base_names }}
       with:
         script: |
+          const applicationSuffix = (process.env.APP_SUFFIX || '').trim();
           const detailsRaw = (process.env.APP_DETAILS || '').trim();
           let apps = [];
 
@@ -315,7 +322,7 @@ jobs:
 
             for (let i = 0; i < arr.length; i++) {
               const it = arr[i] || {};
-              const name = String(it.name || '').trim();
+              const name = String(it.name || '').trim() + applicationSuffix;
               const path = String(it.path || '').trim();
               const images = Array.isArray(it.images) ? it.images.map(String) : [];
 
@@ -326,7 +333,7 @@ jobs:
             }
           } else {
             // Single app mode (inputs)
-            const name = (process.env.APPLICATION || '').trim();
+            const name = (process.env.APPLICATION || '').trim() + applicationSuffix;
             const path = (process.env.DEPLOY_PATH || '').trim();
             const images = [];
 
