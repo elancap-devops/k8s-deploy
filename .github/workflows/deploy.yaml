@@ -322,18 +322,18 @@ jobs:
 
             for (let i = 0; i < arr.length; i++) {
               const it = arr[i] || {};
-              const name = String(it.name || '').trim() + applicationSuffix;
+              const name = String(it.name || '').trim();
               const path = String(it.path || '').trim();
               const images = Array.isArray(it.images) ? it.images.map(String) : [];
 
               if (!name) { core.setFailed(`❌ application_details[${i}].name is required`); return; }
               if (!path) { core.setFailed(`❌ application_details[${i}].path is required`); return; }
 
-              apps.push({ name, path, images });
+              apps.push({ name: name + applicationSuffix, path, images });
             }
           } else {
             // Single app mode (inputs)
-            const name = (process.env.APPLICATION || '').trim() + applicationSuffix;
+            const name = (process.env.APPLICATION || '').trim();
             const path = (process.env.DEPLOY_PATH || '').trim();
             const images = [];
 
@@ -349,7 +349,7 @@ jobs:
             if (!name) { core.setFailed('❌ application is required when application_details is not provided'); return; }
             if (!path) { core.setFailed('❌ deploy_path is required when application_details is not provided'); return; }
 
-            apps.push({ name, path, images });
+            apps.push({ name: name + applicationSuffix, path, images });
           }
 
           core.setOutput('apps', JSON.stringify(apps));
