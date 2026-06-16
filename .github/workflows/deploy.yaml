@@ -96,6 +96,11 @@ on:
         type: string
         default: ''
 
+      application_suffix:
+        required: false
+        type: string
+        default: ""
+        
       # Environment map (single supported shape)
       env_map:
         description: >-
@@ -293,12 +298,14 @@ jobs:
       uses: actions/github-script@v9
       env:
         APP_DETAILS: ${{ inputs.application_details }}
+        APP_SUFFIX: ${{ inputs.application_suffix }}
         APPLICATION: ${{ inputs.application }}
         DEPLOY_PATH: ${{ inputs.deploy_path }}
         IMG_ONE: ${{ inputs.image_base_name }}
         IMG_LIST: ${{ inputs.image_base_names }}
       with:
         script: |
+          const applicationSuffix = (process.env.APP_SUFFIX || '').trim();
           const detailsRaw = (process.env.APP_DETAILS || '').trim();
           let apps = [];
 
@@ -322,7 +329,7 @@ jobs:
               if (!name) { core.setFailed(`❌ application_details[${i}].name is required`); return; }
               if (!path) { core.setFailed(`❌ application_details[${i}].path is required`); return; }
 
-              apps.push({ name, path, images });
+              apps.push({ name: name + applicationSuffix, path, images });
             }
           } else {
             // Single app mode (inputs)
@@ -342,7 +349,7 @@ jobs:
             if (!name) { core.setFailed('❌ application is required when application_details is not provided'); return; }
             if (!path) { core.setFailed('❌ deploy_path is required when application_details is not provided'); return; }
 
-            apps.push({ name, path, images });
+            apps.push({ name: name + applicationSuffix, path, images });
           }
 
           core.setOutput('apps', JSON.stringify(apps));
