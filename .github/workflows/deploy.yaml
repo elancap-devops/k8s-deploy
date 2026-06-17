@@ -157,7 +157,7 @@ on:
 jobs:
   deploy:
     name: >-
-      ${{ inputs.target_environment }}${{ inputs.target_cluster != '' && format(' - {0}', inputs.target_cluster) || '' }}
+      ${{ inputs.target_environment }}${{ inputs.target_cluster != '' && format(' - {0}', inputs.target_cluster) || '' }}${{ inputs.application_suffix }}
     runs-on: ${{ inputs.github_runner }}
     environment: ${{ inputs.github_environment }}
     env:
